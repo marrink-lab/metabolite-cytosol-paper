@@ -19,7 +19,7 @@ plt.style.use("/Users/chrisbrasnett/mystyle.mplstyle")
 load some data
 """
 
-base = '..'
+base = '../..'
 
 # get metabolite classes from the master database spreadsheet on the M3-metabolome repo
 metabolites_url = "https://raw.githubusercontent.com/Martini-Force-Field-Initiative/M3-Metabolome/refs/heads/main/misc/database.csv"
