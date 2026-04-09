@@ -49,7 +49,7 @@ def bootstrap_mannwhitney(
 Some high level things to set up everything else
 """
 
-base = '..'
+base = '../..'
 
 plt.style.use(f"{base}/mystyle.mplstyle")
 
@@ -124,7 +124,7 @@ ax1.bar(
 ### LOAD THE DATA ###
 #####################
 
-datasets = [pickle.load(open(f"{base}/replica_{i}/binding_{i}.pkl", 'rb')) for i in range(1,4)]
+datasets = [pickle.load(open(f"{base}/analysed_data/replica_{i}/binding_{i}.pkl", 'rb')) for i in range(1,4)]
 
 proteomics = pd.read_csv(f'{base}/processed_data/proteomics_annotated.csv',
                          index_col='Locus tag')
