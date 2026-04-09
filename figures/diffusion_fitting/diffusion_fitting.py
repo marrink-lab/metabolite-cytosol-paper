@@ -99,7 +99,7 @@ rsq=r"R$^2$" # for formatting later
 for ax_row, indep_var, lims, ylab in zip(axarr, 
                                    [MWs, sasas, spheres], 
                                    [1800,20,1.5],
-                                   ['Molecular weight', 
+                                   ['Molecular weight (g/mol)', 
                                     r'SASA (nm$^2$)', 
                                     r'Radius ($\sqrt{\frac{\mathrm{SASA}}{4\pi}}$) (nm)']
                                    ):
