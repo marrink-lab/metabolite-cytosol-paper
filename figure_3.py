@@ -231,6 +231,13 @@ frac_significant = np.mean(p_vals < 0.05)
 
 
 mannwhitney_report = []
+
+mannwhitney_report.append(f"No. known ATP binders: {len(known_binders)}")
+mannwhitney_report.append(f"Known ATP binders av. associations: {known_binders.mean():.2f}\n")
+
+mannwhitney_report.append(f"No. ATP non-binders: {len(non_binders)}")
+mannwhitney_report.append(f"ATP non-binders av. associations: {non_binders.mean():.2f}\n")
+
 mannwhitney_report.append(f"No. bootstrap sample tests: {mw_iters}")
 mannwhitney_report.append(f"Median p-value: {median_p:.3g}")
 mannwhitney_report.append(f"Fraction p < 0.05: {frac_significant:.2f}")
