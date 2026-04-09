@@ -1,0 +1,63 @@
+# default seaborn aesthetic
+# darkgrid + deep palette + notebook context
+
+axes.axisbelow: True
+axes.edgecolor: white
+axes.facecolor: EAEAF2
+axes.grid: True
+axes.labelcolor: .15
+axes.labelsize: 20
+axes.linewidth: 1
+axes.prop_cycle: cycler('color', ['0984E3', '7902B0','02B01C','D1C95A',  'C22A00', 'D66694', '262626'])
+#axes.prop_cycle: cycler('color', ['E0B401', 'E08800','E04801','E00101',  'E000BD', '7000E0', '0025E0', '009FE0','00E097', '00E013', 'DBE000'])
+
+axes.titlesize: 13
+
+figure.facecolor: white
+figure.figsize: 8.0, 5.5
+figure.titlesize: 18
+
+font.family: sans-serif
+font.sans-serif: Arial, Liberation Sans, DejaVu Sans, Bitstream Vera Sans, sans-serif
+#font.sans-serif: sans-serif
+
+text.usetex        : false
+
+grid.color: white
+grid.linestyle: -
+grid.linewidth: 1
+
+image.cmap: Greys
+
+legend.fontsize: 12
+legend.frameon: False
+legend.numpoints: 1
+legend.scatterpoints: 1
+
+lines.linewidth: 1.75
+lines.markeredgewidth: 0
+lines.markersize: 8
+lines.solid_capstyle: round
+
+patch.facecolor: 4C72B0
+patch.linewidth: .3
+
+text.color: .15
+
+xtick.color: .15
+xtick.direction: out
+xtick.labelsize: 12
+xtick.major.pad: 7
+xtick.major.size: 0
+xtick.major.width: 1
+xtick.minor.size: 0
+xtick.minor.width: .5
+
+ytick.color: .15
+ytick.direction: out
+ytick.labelsize: 12
+ytick.major.pad: 7
+ytick.major.size: 0
+ytick.major.width: 1
+ytick.minor.size: 0
+ytick.minor.width: .5
