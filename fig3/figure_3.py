@@ -48,9 +48,10 @@ def bootstrap_mannwhitney(
 """
 Some high level things to set up everything else
 """
-plt.style.use("mystyle.mplstyle")
 
-base = '.'
+base = '..'
+
+plt.style.use(f"{base}/mystyle.mplstyle")
 
 colors = {
     'Ions':              '#337AEA',  # bright cobalt
@@ -123,7 +124,7 @@ ax1.bar(
 ### LOAD THE DATA ###
 #####################
 
-datasets = [pickle.load(open(f"replica_{i}/binding_{i}.pkl", 'rb')) for i in range(1,4)]
+datasets = [pickle.load(open(f"{base}/replica_{i}/binding_{i}.pkl", 'rb')) for i in range(1,4)]
 
 proteomics = pd.read_csv(f'{base}/processed_data/proteomics_annotated.csv',
                          index_col='Locus tag')
@@ -323,7 +324,7 @@ ax2.tick_params(labelsize=20)
 ax2.set_ylim(0,4.2)
 
 
-fig.savefig(f"{base}/figure_3.png",
+fig.savefig("figure_3.png",
             dpi=500,
             bbox_inches='tight')
 
