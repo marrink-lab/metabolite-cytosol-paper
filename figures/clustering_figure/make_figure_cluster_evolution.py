@@ -68,6 +68,10 @@ ax.fill_between(proportion_values[:, 0],  # time
                 color='#262626')
 
 
+ax.legend(fontsize = 30,
+          bbox_to_anchor=(1.7,0.5),
+          bbox_transform=ax.transAxes
+          )
 
 # Professional styling
 ax.set_xlim(0, 100)
