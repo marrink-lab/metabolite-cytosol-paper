@@ -14,6 +14,10 @@ from scipy.stats import mannwhitneyu
 import io
 import requests
 
+# from uncertainties.unumpy import uarray
+from uncertainties import ufloat, nominal_value
+from MDAnalysis.units import constants
+
 def bootstrap_mannwhitney(
     x1, err1, x2, err2,
     n_iter=10000,
@@ -289,11 +293,11 @@ fig.subplots_adjust(hspace=0.1)
 
 
 ax0.set_yscale('log')
-ax0.set_ylabel('Diffusion (x10$^{-9}$ m$^2$/s)', fontsize=40)
+ax0.set_ylabel('Diffusion (cm$^2$/s)', fontsize=40)
 
 
 ax0.tick_params(labelsize=20)
-ax0.set_ylim(10e-2,10e2)
+# ax0.set_ylim(2e0,10e2)
 ax0.set_xticks(np.arange(len(diffusion)),
                  ['']*len(diffusion))
     
