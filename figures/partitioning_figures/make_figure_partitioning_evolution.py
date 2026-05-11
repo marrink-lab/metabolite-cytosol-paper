@@ -54,8 +54,6 @@ ax.stackplot(proportion_values[:, 0],  # time
              linewidth=0,
              labels=['Soluble', 'Protein-associated', 'Clustered'])
 
-
-
 ax.fill_between(proportion_values[:, 0],  # time
                 proportion_values.T[2] - proportion_errs.T[2],
                 proportion_values.T[2] + proportion_errs.T[2],

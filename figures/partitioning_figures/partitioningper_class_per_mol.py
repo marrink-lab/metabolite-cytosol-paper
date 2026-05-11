@@ -146,9 +146,12 @@ def plot_time_averaged_by_class(avg_frac, std_frac, mol_to_class):
             # patch_artist=True,
             zorder=10           
         )
-
-        ax.set_title(' '.join(cls.split('_')),
-                     fontsize=20)
+        title = ' '.join(cls.split('_'))
+        if title != 'Lipids':
+            ax.set_title(' '.join(cls.split('_')),
+                         fontsize=20)
+        else:
+            ax.set_title('Fatty acid', fontsize=20)
         ax.set_xticks([])
         ax.set_ylim(0, 1)
 

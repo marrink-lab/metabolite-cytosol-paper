@@ -22,7 +22,7 @@ CLASS_LABELS = {
     'Carbohydrates': 'Carbohyd.', 
     'Cofactors': 'Cofactors',
     'Ions': 'Ions', 
-    'Lipids': 'Lipids', 
+    'Lipids': 'Fatty acid', 
     'Nucleotides': 'Nucleotides', 
     'Other_Metabolites': 'Other',
 }
