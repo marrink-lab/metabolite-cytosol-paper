@@ -69,7 +69,7 @@ colors = {
 
 cl_labels = [
     'Ions',
-    'Lipids',
+    'Fatty\nacid',
     'Nucleotides',
     'Cofactors',
     'Amino\nacids',
@@ -93,6 +93,7 @@ Diffusion
 diffusion_dict = pickle.load(open(f'{base}/processed_data/diffusion/diffusion_coefficients.pkl', 'rb'))
 
 data_in = []
+extra = []
 for cl in colors.keys():
     data_in.append([j[0] for i,j in diffusion_dict['results'][cl].items()])
 
@@ -105,7 +106,7 @@ parts = ax0.violinplot(data_in,
 for i, pc in enumerate(parts['bodies']):
     pc.set_facecolor(list(colors.values())[i])
     # pc.set_edgecolor('black')
-    # pc.set_linewidth(2)
+    pc.set_linewidth(2)
     
     pc.set_alpha(1)
     pc.set_edgecolor('#262626')
@@ -115,7 +116,7 @@ for i,j in parts.items():
         continue
     else:
         parts[i].set_colors('#262626')
-        parts[i].set_linewidth(3)
+        parts[i].set_linewidth(5)
 
 
 """
@@ -232,7 +233,7 @@ non_binders = binding_values[np.where(np.array(labels) == False)[0]]
 known_binders_err = binding_errors[np.where(np.array(labels) == True)[0]]
 non_binders_err = binding_errors[np.where(np.array(labels) == False)[0]]
 
-mw_iters = 50000
+mw_iters = 100000
 
 U_vals, p_vals = bootstrap_mannwhitney(
     known_binders, known_binders_err,

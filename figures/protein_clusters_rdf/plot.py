@@ -83,24 +83,33 @@ def cluster_plotter(path, label, ax, col):
                     color=col,
                     )
 
-def rdf_plot(path, ax, color, label):
+def rdf_plot(path, ax):
     
-    # fs = "../../analysed_data/with_metabolites/*/protein_rdf_*.pkl"
+    labs = {'with_metabolites': 'With metabolites',
+            'without_metabolites': 'Without metabolites',
+            }
+    cols = {'with_metabolites': '#05938E',
+            'without_metabolites': '#666666',
+            }
+    data = pickle.load(open(path, 'rb'))
     
-    SMOOTH_SIGMA_RDF     = 3
-    
-    results_files = sorted(glob.glob(path))
-    results_list  = [pickle.load(open(f, 'rb')) for f in results_files]
-    
-    r = np.stack([i['r'] for i in results_list]).mean(axis=0) / 10
-    _gr = np.stack([gaussian_filter1d(i['gr'], sigma=SMOOTH_SIGMA_RDF) for i in results_list])
-    # gr = _gr.mean(axis=0)
-    # gr_err = _gr.std(axis=0)
+    for i,j in data.items():
+        ax.plot(j['r']/10,
+                gaussian_filter1d(j['gr_mean'], 3),
+                label=labs[i],
+                c = cols[i]
+                )
+        ax.fill_between(j['r']/10,
+                gaussian_filter1d(j['gr_mean'], 3) - gaussian_filter1d(j['gr_std'], 3),
+                gaussian_filter1d(j['gr_mean'], 3) + gaussian_filter1d(j['gr_std'], 3),
+                # label=labs[i],
+                color = cols[i],
+                alpha=.2
+                )
+        
+    ax.legend()
 
-    mean = _gr.mean(axis=0)
-    std  = _gr.std(axis=0)
-    ax.plot(r, mean, color=color, lw=2.0, solid_capstyle='round', label=label)
-    ax.fill_between(r, mean - std, mean + std, color=color, alpha=0.2)
+    
 
 fig, (ax1,ax2) = plt.subplots(    1, 2, figsize=(10, 4),
     gridspec_kw={'width_ratios': [1, 1], 'wspace': 0.25}
@@ -118,13 +127,16 @@ ax1.legend()
 ax1.set_xlim(left=0)
 ax1.legend(loc='upper left', frameon=False, fontsize=10.5)
 
-rdf_plot("../../analysed_data/with_metabolites/*/protein_rdf_*.pkl",
-         ax2,
-         color='#05938E',label='With metabolites')
 
-rdf_plot("../../analysed_data/no_metabolites/*/protein_rdf_*.pkl",
-         ax2,
-         color='#666666',label='Without metabolites')
+rdf_plot('protein_rdf.pkl',
+         ax2
+         )
+         # ax2,
+         # color='#05938E',label='With metabolites')
+
+# rdf_plot("../../analysed_data/no_metabolites/*/protein_rdf_*.pkl",
+#          ax2,
+#          color='#666666',label='Without metabolites')
 
 ax2.axhline(1.0, color='#BBBBBB', lw=0.8, ls='--', zorder=1)
 ax2.set_xlabel('r (nm)', fontsize=15)
