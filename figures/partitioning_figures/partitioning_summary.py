@@ -28,7 +28,7 @@ CLASS_LABELS = {
 }
 
 # ── Load ──────────────────────────────────────────────────────────────────────
-results_files = sorted(glob.glob("../../analysed_data/*/cluster_states_*.pkl"))
+results_files = sorted(glob.glob("../../analysed_data/with_metabolites/*/cluster_states_*.pkl"))
 results_list  = [pickle.load(open(f, 'rb'))['results'] for f in results_files]
 
 # get metabolite classes from the master database spreadsheet on the M3-metabolome repo
