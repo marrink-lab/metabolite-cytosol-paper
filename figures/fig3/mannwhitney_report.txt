@@ -2,10 +2,10 @@ No. known ATP binders: 45
 Known ATP binders av. associations: 1.44
 
 No. ATP non-binders: 331
-ATP non-binders av. associations: 1.20
+ATP non-binders av. associations: 1.21
 
 No. bootstrap sample tests: 100000
-Median p-value: 0.0287
+Median p-value: 0.0286
 Fraction p < 0.05: 0.67
-68% interval on p-value: [0.00708, 0.0898]
-Nominal p-value (ignoring errors): 1.849e-02
+68% interval on p-value: [0.00706, 0.09]
+Nominal p-value (ignoring errors): 1.869e-02

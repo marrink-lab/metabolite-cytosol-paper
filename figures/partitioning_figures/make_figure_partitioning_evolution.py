@@ -31,7 +31,7 @@ for result in results_list:
     results.append(analysed_results)
 
 # this line because one didn't quite run to the last frame
-results = [i[:250] for i in results]
+results = [i for i in results]
 proportions = np.stack(results)
 
 proportion_values = proportions.mean(axis=0)
