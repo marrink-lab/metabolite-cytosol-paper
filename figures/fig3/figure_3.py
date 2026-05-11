@@ -59,14 +59,23 @@ plt.style.use(f"{base}/mystyle.mplstyle")
 
 colors = {
     'Ions':              '#337AEA',  # bright cobalt
+    'Lipids':            '#05938E',  # jade teal
     'Nucleotides':       '#944CE5',  # bright violet
     'Cofactors':         '#B7C61E',  # bright olive
     'Amino_Acids':       '#F9B714',  # bright warm yellow
     'Other_Metabolites': '#CC7FDB',  # bright mauve
-    'Lipids':            '#05938E',  # jade teal
     'Carbohydrates':     '#3FB760',  # bright fern
 }
 
+cl_labels = [
+    'Ions',
+    'Lipids',
+    'Nucleotides',
+    'Cofactors',
+    'Amino\nacids',
+    'Other',
+    'Carbohyd.',
+    ]
 classes = list(colors.keys())
 
 fig, (ax0,ax1, ax2) = plt.subplots(3,1,
@@ -113,11 +122,11 @@ for i,j in parts.items():
 lifetimes
 """
 
-diffusion = pd.read_csv(f'{base}/processed_data/lifetimes/residence_exponents.csv')
+diffusion = pd.read_csv(f'{base}/processed_data/lifetimes/residence_exponents.csv').sort_values('exponent', ascending=False)
 cols = [colors[i] for i in diffusion['class']]
 
 ax1.bar(
-       ['\n'.join(i.split('_')) for i in diffusion['class']],
+       cl_labels, #['\n'.join(i.split('_')) for i in diffusion['class']],
        diffusion['exponent'],
        color=cols,
        yerr=diffusion['exponent_err'],
@@ -128,7 +137,7 @@ ax1.bar(
 ### LOAD THE DATA ###
 #####################
 
-datasets = [pickle.load(open(f"{base}/analysed_data/replica_{i}/binding_{i}.pkl", 'rb')) for i in range(1,4)]
+datasets = [pickle.load(open(f"{base}/analysed_data/with_metabolites/replica_{i}/binding_{i}.pkl", 'rb')) for i in range(1,4)]
 
 proteomics = pd.read_csv(f'{base}/processed_data/proteomics_annotated.csv',
                          index_col='Locus tag')
@@ -301,10 +310,10 @@ ax0.tick_params(labelsize=20)
 ax0.set_xticks(np.arange(len(diffusion)),
                  ['']*len(diffusion))
     
-for i,j in enumerate(['\n'.join(i.split('_')) for i in diffusion['class']]):
+for i,j in enumerate(cl_labels): #['\n'.join(i.split('_')) for i in diffusion['class']]):
     ax1.text(i,0.1,
              j,
-             fontsize=20,
+             fontsize=22.5,
              ma='center',
              va='center',
              ha='center'

@@ -13,7 +13,7 @@ COLORS = {'protein_adsorbed': '#8C64C8',
           'clustered': '#FF9664'}
 
 # ── Load ─────────────────────────────────────────────────────────────────────
-results_files = sorted(glob.glob("../../analysed_data/*/cluster_states_*.pkl"))
+results_files = sorted(glob.glob("../../analysed_data/with_metabolites/*/cluster_states_*.pkl"))
 results_list  = [pickle.load(open(f, 'rb'))['results'] for f in results_files]
 
 results = []
@@ -30,7 +30,8 @@ for result in results_list:
         analysed_results[idx, 1:] = totals
     results.append(analysed_results)
 
-
+# this line because one didn't quite run to the last frame
+results = [i[:250] for i in results]
 proportions = np.stack(results)
 
 proportion_values = proportions.mean(axis=0)

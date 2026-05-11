@@ -215,7 +215,7 @@ def export_data(mol_to_class, avg_frac_mean, avg_frac_std):
             df.to_excel(writer, sheet_name=sheet_name)
 
 # ── Load ─────────────────────────────────────────────────────────────────────
-results_files = sorted(glob.glob("../../analysed_data/*/cluster_states_*.pkl"))
+results_files = sorted(glob.glob("../../analysed_data/with_metabolites/*/cluster_states_*.pkl"))
 results_list  = [pickle.load(open(f, 'rb'))['results'] for f in results_files]
 
 
