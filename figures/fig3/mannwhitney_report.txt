@@ -6,6 +6,6 @@ ATP non-binders av. associations: 1.21
 
 No. bootstrap sample tests: 100000
 Median p-value: 0.0286
-Fraction p < 0.05: 0.67
-68% interval on p-value: [0.00706, 0.09]
+Fraction p < 0.05: 0.68
+68% interval on p-value: [0.007, 0.0896]
 Nominal p-value (ignoring errors): 1.869e-02
