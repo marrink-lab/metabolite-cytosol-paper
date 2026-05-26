@@ -14,10 +14,6 @@ from scipy.stats import mannwhitneyu
 import io
 import requests
 
-# from uncertainties.unumpy import uarray
-from uncertainties import ufloat, nominal_value
-from MDAnalysis.units import constants
-
 def bootstrap_mannwhitney(
     x1, err1, x2, err2,
     n_iter=10000,
@@ -95,20 +91,33 @@ diffusion_dict = pickle.load(open(f'{base}/processed_data/diffusion/diffusion_co
 data_in = []
 extra = []
 for cl in colors.keys():
-    data_in.append([j[0] for i,j in diffusion_dict['results'][cl].items()])
+    data_in.append([j for i,j in diffusion_dict['results'][cl].items()])
 
-parts = ax0.violinplot(data_in,
-                       positions = np.arange(len(data_in)),
+violin = [[j[0] for j in i] for i in data_in]
+parts = ax0.violinplot(violin,
+                       positions = np.arange(len(violin)),
                        # showmeans=True,
                        showmedians=True
                        )
 
+for i,j in enumerate(data_in):
+    ax0.errorbar(np.random.normal(i, 0.05,
+                                  size=len(j)),
+                 [k[0] for k in j],
+                 yerr= [k[1] for k in j],
+                 marker='.',
+                 markersize = 30,
+                 markeredgewidth=1,
+                 markeredgecolor='#262626',
+                 ls='none',
+                 color=list(colors.values())[i]
+                 )
+
 for i, pc in enumerate(parts['bodies']):
     pc.set_facecolor(list(colors.values())[i])
-    # pc.set_edgecolor('black')
     pc.set_linewidth(2)
-    
-    pc.set_alpha(1)
+    pc.set_zorder(10)    
+    pc.set_alpha(.3)
     pc.set_edgecolor('#262626')
 
 for i,j in parts.items():
@@ -116,8 +125,8 @@ for i,j in parts.items():
         continue
     else:
         parts[i].set_colors('#262626')
+        parts[i].set_zorder(10)
         parts[i].set_linewidth(5)
-
 
 """
 lifetimes
@@ -192,9 +201,6 @@ names_sorted = np.array(names)[sorter]
 x_plt = np.arange(len(names_sorted))
 mask_sorted = np.array(mask)[sorter]
 
-# make the plot
-# fig, ax = plt.subplots(figsize = (15,10))
-
 # plot the binders
 ax2.bar(x_plt[mask_sorted],
        data[mask_sorted],
@@ -219,7 +225,6 @@ ax2.bar(x_plt[~mask_sorted],
        align='center',
        alpha=0.5,
        )
-
 
 # set things up for statistical testing
 binding_values = arr.T[0]
@@ -307,11 +312,11 @@ ax0.set_ylabel('Diffusion (cm$^2$/s)', fontsize=40)
 
 
 ax0.tick_params(labelsize=20)
-# ax0.set_ylim(2e0,10e2)
+
 ax0.set_xticks(np.arange(len(diffusion)),
                  ['']*len(diffusion))
     
-for i,j in enumerate(cl_labels): #['\n'.join(i.split('_')) for i in diffusion['class']]):
+for i,j in enumerate(cl_labels): 
     ax1.text(i,0.1,
              j,
              fontsize=22.5,
@@ -329,7 +334,6 @@ ax1.tick_params(axis='y',
 
 ax1.set_ylabel('Association lifetime\ndistribution, power\nlaw exponent', fontsize = 40)
 
-
 ax2.set_xticks([])
 ax2.set_xlim(-0.75,np.arange(len(names_sorted))[-1]+0.75)
 ax2.set_ylabel('Asssociation events\nper protein per ATP', 
@@ -337,12 +341,6 @@ ax2.set_ylabel('Asssociation events\nper protein per ATP',
 ax2.tick_params(labelsize=20)
 ax2.set_ylim(0,4.2)
 
-
 fig.savefig("figure_3.png",
             dpi=500,
             bbox_inches='tight')
-
-
-
-
-
