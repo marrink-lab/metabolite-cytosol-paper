@@ -1,5 +1,4 @@
 import matplotlib
-import numpy as np
 import pandas as pd
 
 matplotlib.use("Agg")
@@ -7,7 +6,7 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 met = pd.read_csv("cytosol_composition_metabolites.csv")
-info = pd.read_csv("info.csv")
+info = pd.read_csv("../../processed_data/info.csv")
 
 merged = met.merge(
     info[["resname", "class"]], left_on="Resname", right_on="resname", how="left"
@@ -133,12 +132,6 @@ for i, (cls, pct) in enumerate(small_segs.items()):
         fontweight="bold",
     )
     x += len(label) * 0.0055 + 0.025  # gap between entries
-
-## System stats — right side, clearly separated
-# stats = '500 ns  -  ~1 fL  -  382 protein species  -  139 metabolite types'
-# ax_foot.text(0.998, 0.50, stats,
-#             transform=ax_foot.transAxes,
-#             fontsize=7.5, color=LGRAY, va='center', ha='right')
 
 fig.tight_layout(pad=0)
 fig.savefig("figure_1A.png", bbox_inches="tight", transparent=True)
