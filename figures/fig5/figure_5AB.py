@@ -8,8 +8,8 @@ from scipy.ndimage import gaussian_filter1d
 plt.style.use("../../mystyle.mplstyle")
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-CONTACTS_PKL = "protein_contacts.pkl"
-RDF_PKL = "protein_rdf.pkl"
+CONTACTS_PKL = "../../processed_data/protein_clustering/protein_contacts.pkl"
+RDF_PKL = "../../processed_data/protein_clustering/protein_rdf.pkl"
 
 SMOOTH_SIGMA_CONTACTS = 5
 SMOOTH_SIGMA_RDF = 5
