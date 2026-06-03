@@ -25,6 +25,7 @@ MET_COLORS = {
 }
 MET_LABELS = {
     "Lipids": "Lipids",
+    "Fatty_Acids": "Fatty acids",
     "Ions": "Ions",
     "Carbohydrates": "Carbohydrates",
     "Nucleotides": "Nucleotides",
