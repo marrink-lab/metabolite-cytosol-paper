@@ -9,9 +9,9 @@ import pandas as pd
 plt.style.use("../../mystyle.mplstyle")
 
 PICKLES = [
-    "cluster_compositions_rep0.pkl",
-    "cluster_compositions_rep1.pkl",
-    "cluster_compositions_rep2.pkl",
+    "../../processed_data/cluster_composition/cluster_compositions_rep0.pkl",
+    "../../processed_data/cluster_composition/cluster_compositions_rep1.pkl",
+    "../../processed_data/cluster_composition/cluster_compositions_rep2.pkl",
 ]
 
 CLASS_COLORS = {
@@ -36,7 +36,7 @@ CLASS_LABELS = {
 TEAL = "#05938E"
 
 mol_to_class = dict(
-    zip(*pd.read_csv("molecules_list.csv")[["resname", "class"]].values.T)
+    zip(*pd.read_csv("../../processed_data/info.csv")[["resname", "class"]].values.T)
 )
 
 
