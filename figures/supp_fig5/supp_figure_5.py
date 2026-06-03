@@ -38,7 +38,7 @@ VMAX = 1.0
 TEXT_COLOR = "#444444"
 
 mol_to_class = dict(
-    zip(*pd.read_csv("molecules_list.csv")[["resname", "class"]].values.T)
+    zip(*pd.read_csv("../../processed_data/info.csv")[["resname", "class"]].values.T)
 )
 
 M = np.zeros((n_classes, n_classes))
@@ -133,4 +133,4 @@ cbar.set_label(
     "Pairwise enrichment in clusters", color=TEXT_COLOR, labelpad=4, fontsize=9
 )
 
-fig.savefig("supp_fig4.png", bbox_inches="tight", dpi=300)
+fig.savefig("supp_fig5.png", bbox_inches="tight", dpi=300)
