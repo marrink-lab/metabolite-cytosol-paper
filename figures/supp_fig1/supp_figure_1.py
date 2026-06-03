@@ -13,7 +13,8 @@ plt.style.use("../../mystyle.mplstyle")
 T_MAX_NS = 500  # full simulation range to display
 
 # Bottom panel: cluster size
-PKL_W_MET = "with_metabolites_6A.pkl"
+# PKL_W_MET = "../../processed_data/protein_clustering/with_metabolites_6A.pkl"
+PKL_W_MET = "with_metabolites_10A.pkl"
 TIME_STEP_NS = 0.2
 SMOOTH_SIGMA_CLUSTER = 5
 TRACE_CMAP = "viridis"
@@ -81,6 +82,7 @@ for result in results_list:
     results.append(analysed_results)
 
 # Truncate all replicates to the shortest so np.stack doesn't fail
+print(results)
 min_frames = min(len(r) for r in results)
 results = [r[:min_frames] for r in results]
 proportions = np.stack(results)
@@ -167,7 +169,7 @@ for ndx, ax in enumerate((ax1, ax2)):
     ax.spines["right"].set_visible(False)
 
 fig.savefig(
-    "cluster_and_partitioning.png",
+    "supp_figure_1.png",
     dpi=300,
     bbox_inches="tight",
     facecolor="white",
