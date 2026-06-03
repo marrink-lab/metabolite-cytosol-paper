@@ -7,9 +7,9 @@ from matplotlib.colors import to_rgb
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 PICKLES = [
-    "cluster_compositions_rep0.pkl",
-    "cluster_compositions_rep1.pkl",
-    "cluster_compositions_rep2.pkl",
+    "../../processed_data/cluster_composition/cluster_compositions_rep0.pkl",
+    "../../processed_data/cluster_composition/cluster_compositions_rep1.pkl",
+    "../../processed_data/cluster_composition/cluster_compositions_rep2.pkl",
 ]
 
 CLASS_COLORS = {
