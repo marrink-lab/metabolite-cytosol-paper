@@ -43,7 +43,7 @@ def load_resname_to_name(path):
 
 
 mol_to_class = dict(
-    zip(*pd.read_csv("molecules_list.csv")[["resname", "class"]].values.T)
+    zip(*pd.read_csv("../../processed_data/info.csv")[["resname", "class"]].values.T)
 )
 resname_to_name = load_resname_to_name(DATABASE_PATH)
 
@@ -175,4 +175,4 @@ ax.legend(
 )
 
 fig.tight_layout(pad=0.6)
-fig.savefig("supp_figure6.png", dpi=300, bbox_inches="tight", transparent=False)
+fig.savefig("supp_figure_6.png", dpi=300, bbox_inches="tight", transparent=False)
