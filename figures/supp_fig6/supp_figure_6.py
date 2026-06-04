@@ -5,6 +5,8 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import io
+import requests
 
 plt.style.use("../../mystyle.mplstyle")
 
@@ -19,27 +21,23 @@ CLASS_COLORS = {
 }
 TOP_N = 10
 MIN_BULK_COUNT = 25
-DATABASE_PATH = "database.md"
+DATABASE_PATH = "https://raw.githubusercontent.com/Martini-Force-Field-Initiative/M3-Metabolome/refs/heads/main/misc/database.csv"
 
 
-def load_resname_to_name(path):
-    """Parse a pipe-delimited markdown table and return resname -> metabolite name."""
-    mapping = {}
-    with open(path) as f:
-        lines = [ln.strip() for ln in f if ln.strip().startswith("|")]
-    # First line is the header, second is the separator (|---|---|)
-    header = [c.strip() for c in lines[0].strip("|").split("|")]
-    name_col = header.index("Metabolite name")
-    res_col = header.index("resname")
-    for ln in lines[2:]:
-        cells = [c.strip() for c in ln.strip("|").split("|")]
-        if len(cells) <= max(name_col, res_col):
-            continue
-        resname = cells[res_col]
-        name = cells[name_col]
-        if resname and name:
-            mapping[resname] = name
-    return mapping
+def load_resname_to_name(metabolites_url):
+    """
+    generate dict of {resname: molecule name} from the metabolite database
+    """
+    s = requests.get(metabolites_url).content
+    
+    metabolites = pd.read_csv(
+        io.StringIO(s.decode("utf-8")),
+        usecols=["Metabolite name", "resname"],
+        index_col="resname",
+    )
+    
+    metabolite_classes = metabolites.to_dict()["Metabolite name"]
+    return metabolite_classes
 
 
 mol_to_class = dict(
