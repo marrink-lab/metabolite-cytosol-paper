@@ -1,0 +1,178 @@
+#!/usr/bin/env python3
+import pickle
+from collections import defaultdict
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+plt.style.use("../../mystyle.mplstyle")
+
+CLASS_COLORS = {
+    "Nucleotides": "#7443BB",
+    "Amino_Acids": "#F9B714",
+    "Carbohydrates": "#3FB760",
+    "Cofactors": "#B7C61E",
+    "Fatty_Acids": "#05938E",
+    "Ions": "#5B81F6",
+    "Other_Metabolites": "#CC7FDB",
+}
+TOP_N = 10
+MIN_BULK_COUNT = 25
+DATABASE_PATH = "database.md"
+
+
+def load_resname_to_name(path):
+    """Parse a pipe-delimited markdown table and return resname -> metabolite name."""
+    mapping = {}
+    with open(path) as f:
+        lines = [ln.strip() for ln in f if ln.strip().startswith("|")]
+    # First line is the header, second is the separator (|---|---|)
+    header = [c.strip() for c in lines[0].strip("|").split("|")]
+    name_col = header.index("Metabolite name")
+    res_col = header.index("resname")
+    for ln in lines[2:]:
+        cells = [c.strip() for c in ln.strip("|").split("|")]
+        if len(cells) <= max(name_col, res_col):
+            continue
+        resname = cells[res_col]
+        name = cells[name_col]
+        if resname and name:
+            mapping[resname] = name
+    return mapping
+
+
+mol_to_class = dict(
+    zip(*pd.read_csv("../../processed_data/info.csv")[["resname", "class"]].values.T)
+)
+resname_to_name = load_resname_to_name(DATABASE_PATH)
+
+
+def get_class(rn):
+    if rn not in mol_to_class:
+        print(f"Warning: resname '{rn}' not found in molecules_list.csv, skipping.")
+        return None
+    return mol_to_class[rn]
+
+
+def get_display_name(rn):
+    """Return the metabolite name from the database, falling back to the resname."""
+    return resname_to_name.get(rn, rn)
+
+
+# ── Per-replicate mean cluster fraction per resname (zeros included) ──────────
+rep_enrichments = []
+rep_bulk_counts = []
+
+for rep_idx in range(3):
+    with open(
+        f"../../processed_data/cluster_composition/cluster_compositions_rep{rep_idx}.pkl",
+        "rb",
+    ) as f:
+        data = pickle.load(f)
+    bulk = {("CA" if rn == "ION" else rn): c for rn, c in data["bulk_counts"].items()}
+    rep_bulk_counts.append(bulk)
+
+    sum_frac = defaultdict(float)
+    n_clusters = 0
+    for comp in data["cluster_compositions"]:
+        recognised = {
+            ("CA" if rn == "ION" else rn): c
+            for rn, c in comp.items()
+            if get_class(rn) is not None
+        }
+        total = sum(recognised.values())
+        if total == 0:
+            continue
+        n_clusters += 1
+        for rn, c in recognised.items():
+            sum_frac[rn] += c / total
+
+    if n_clusters == 0:
+        rep_enrichments.append({})
+        continue
+
+    mean_frac = {rn: s / n_clusters for rn, s in sum_frac.items()}
+    total_bulk = sum(bulk.values())
+    rep_enrichments.append(
+        {
+            rn: f / (bulk.get(rn, 0) / total_bulk)
+            for rn, f in mean_frac.items()
+            if bulk.get(rn, 0) > 0
+        }
+    )
+
+# ── Aggregate across replicates ───────────────────────────────────────────────
+all_resnames = sorted({rn for r in rep_enrichments for rn in r})
+enr_mean = {rn: np.mean([r.get(rn, 0) for r in rep_enrichments]) for rn in all_resnames}
+enr_std = {rn: np.std([r.get(rn, 0) for r in rep_enrichments]) for rn in all_resnames}
+mean_bulk = {
+    rn: np.mean([b.get(rn, 0) for b in rep_bulk_counts]) for rn in all_resnames
+}
+
+abundant = [rn for rn in all_resnames if mean_bulk[rn] >= MIN_BULK_COUNT]
+dropped = len(all_resnames) - len(abundant)
+if dropped:
+    print(
+        f"Dropping {dropped} species with fewer than {MIN_BULK_COUNT} molecules in the box"
+    )
+
+top = sorted(abundant, key=enr_mean.get, reverse=True)[:TOP_N]
+means = np.array([enr_mean[rn] for rn in top])
+stds = np.array([enr_std[rn] for rn in top])
+colors = [CLASS_COLORS.get(get_class(rn), "#999999") for rn in top]
+labels = [get_display_name(rn) for rn in top]
+
+# Report any resnames missing from the database
+missing = [rn for rn in top if rn not in resname_to_name and rn != "CA"]
+if missing:
+    print(f"Warning: no metabolite name found for: {missing}")
+
+# ── Plot: horizontal bar chart, sized for SI readability ──────────────────────
+fig, ax = plt.subplots(figsize=(9.0, 5.8))
+
+y = np.arange(len(top))
+ax.barh(
+    y,
+    means,
+    xerr=stds,
+    height=0.7,
+    color=colors,
+    edgecolor="white",
+    linewidth=0.8,
+    error_kw=dict(ecolor="black", lw=1.4, capsize=4.0),
+)
+ax.axvline(1.0, color="black", lw=1.2, ls="--")
+ax.set_yticks(y)
+ax.set_yticklabels(
+    labels, fontsize=17, rotation=25, rotation_mode="anchor", ha="right", va="center"
+)
+ax.invert_yaxis()
+ax.set_xlim(0, means.max() * 1.15)
+ax.set_xlabel("Enrichment relative to bulk", fontsize=19)
+ax.tick_params(axis="x", labelsize=16)
+ax.tick_params(axis="y", labelsize=17)
+
+# Legend below the axes, single horizontal row
+seen = []
+for rn in top:
+    cls = get_class(rn)
+    if cls and cls not in seen:
+        seen.append(cls)
+handles = [plt.Rectangle((0, 0), 1, 1, color=CLASS_COLORS[c]) for c in seen]
+legend_labels = [c.replace("_", " ") for c in seen]
+ax.legend(
+    handles,
+    legend_labels,
+    loc="upper center",
+    bbox_to_anchor=(0.5, -0.13),
+    ncol=min(len(seen), 4),
+    fontsize=16,
+    frameon=False,
+    handlelength=1.6,
+    handletextpad=0.6,
+    columnspacing=2.0,
+)
+
+fig.tight_layout(pad=0.6)
+fig.savefig("supp_figure_6.png", dpi=300, bbox_inches="tight", transparent=False)
