@@ -3,3 +3,5 @@ rsync.txt
 personal_extra/*
 old_figures/*
 .idea/
+**/_revision/data/*
+/figures/_revision/proteins
