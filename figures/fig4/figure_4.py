@@ -10,7 +10,8 @@ import numpy as np
 import pandas as pd
 import requests
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-from scipy.stats import mannwhitneyu
+from scipy.stats import mannwhitneyu, gaussian_kde
+
 from tqdm import tqdm
 
 
@@ -167,6 +168,8 @@ datasets = [
     for i in range(1, 4)
 ]
 
+surface_areas = pickle.load(open(f"{base}/figures/_revision/protein_sasa.pkl", "rb"))
+
 proteomics = pd.read_csv(
     f"{base}/processed_data/proteomics_annotated.csv", index_col="Locus tag"
 )
@@ -185,14 +188,27 @@ metabolite_classes = metabolites.to_dict()["class"]
 
 # for each replica, for each protein, get the number of normalised counts for ATP.
 # we end up with a dictionary of {protein: [normalised_count_0, normalised_count_1... normalised_count_n]}
+# ATP_results = defaultdict(list)
+# for idx, d in enumerate(datasets):
+#     ATP_vals = {
+#         protein: value.get("ATPH", {}).get("normalised_count", 0)
+#         for protein, value in d["protein_results"].items()
+#     }
+#     for protein, val in ATP_vals.items():
+#         ATP_results[protein].append(val)
+
 ATP_results = defaultdict(list)
 for idx, d in enumerate(datasets):
     ATP_vals = {
-        protein: value.get("ATPH", {}).get("normalised_count", 0)
+        protein: {'ATP_count': value.get("ATPH", {}).get("count", 0),
+                  'protein_count': d['n_proteins'][protein],
+                  'protein_SASA': surface_areas.get(protein)
+                  }
         for protein, value in d["protein_results"].items()
     }
-    for protein, val in ATP_vals.items():
-        ATP_results[protein].append(val)
+    for protein, values in ATP_vals.items():
+        ATP_results[protein].append(values['ATP_count'] / (values['protein_count'] * values['protein_SASA']))
+
 
 # from the proteomics, make a dictionary indicating whether the each protein is a known binder of ATP or not
 ATP_mask = {}
@@ -223,28 +239,29 @@ names_sorted = np.array(names)[sorter]
 x_plt = np.arange(len(names_sorted))
 mask_sorted = np.array(mask)[sorter]
 
-# plot the binders
-ax2.bar(
-    x_plt[mask_sorted],
-    data[mask_sorted],
-    yerr=err[mask_sorted],
-    error_kw={"elinewidth": 0.75, "ecolor": "#944CE5"},
-    color="#944CE5",
-    label="Known binders",
-    width=1,
-    align="center",
-)
-# plot the non binders
-ax2.bar(
-    x_plt[~mask_sorted],
-    data[~mask_sorted],
-    yerr=err[~mask_sorted],
-    error_kw={"elinewidth": 0.75, "ecolor": "#3C3B30", "alpha": 0.5},
-    color="#3C3B30",
-    label="Non binders",
-    align="center",
-    alpha=0.5,
-)
+# # plot the binders
+# ax2.bar(
+#     x_plt[mask_sorted],
+#     data[mask_sorted],
+#     yerr=err[mask_sorted],
+#     error_kw={"elinewidth": 0.75, "ecolor": "#944CE5"},
+#     color="#944CE5",
+#     label="Known binders",
+#     width=1,
+#     align="center",
+# )
+# # plot the non binders
+# ax2.bar(
+#     x_plt[~mask_sorted],
+#     data[~mask_sorted],
+#     yerr=err[~mask_sorted],
+#     error_kw={"elinewidth": 0.75, "ecolor": "#3C3B30", "alpha": 0.5},
+#     color="#3C3B30",
+#     label="Non binders",
+#     align="center",
+#     alpha=0.5,
+# )
+
 
 # set things up for statistical testing
 binding_values = arr.T[0]
@@ -257,6 +274,44 @@ non_binders = binding_values[np.where(np.array(labels) == False)[0]]
 # errs
 known_binders_err = binding_errors[np.where(np.array(labels) == True)[0]]
 non_binders_err = binding_errors[np.where(np.array(labels) == False)[0]]
+
+
+violin_width = 0.5  # matches matplotlib's default `widths` arg
+violin1 = ax2.violinplot([known_binders, non_binders],
+                         positions = [0,1],
+                         widths=violin_width
+                         )
+
+for i, pc in enumerate(violin1["bodies"]):
+    # pc.set_facecolor(list(colors.values())[i])
+    pc.set_linewidth(2)
+    pc.set_zorder(10)
+    # pc.set_alpha()
+    pc.set_edgecolor("#262626")
+
+
+# Overlay the scatter plot for individual data points
+for pos, data, error in zip([0,1], 
+                            [known_binders, non_binders], 
+                            [known_binders_err, non_binders_err]):
+    kde = gaussian_kde(data)          # same density estimator violinplot uses
+    dens = kde(data)                  # density at each point's own y-value
+    dens_norm = dens / dens.max()     # rescale to [0, 1] (1 = violin's widest spot)
+  
+    # Add small horizontal jitter so points don't overlap completely
+    half_width = violin_width / 3
+    jitter = np.random.uniform(-1, 1, size=len(data)) * dens_norm * half_width
+    ax2.errorbar(pos + jitter, 
+                data, 
+                yerr=error,
+                color='black', alpha=0.3, lw=.5,
+                marker=".",
+                markersize=30,
+                markeredgewidth=1,
+                markeredgecolor="#262626",
+                ls="none",
+                zorder=1)
+
 
 mw_iters = 100000
 
@@ -297,13 +352,15 @@ mannwhitney_report.append(f"Nominal p-value (ignoring errors): {p_nominal:.3e}")
 with open("mannwhitney_report.txt", "w") as f:
     f.writelines("\n".join(mannwhitney_report))
 
+print("\n".join(mannwhitney_report))
 
 # make the inset plot of the p-values
 axins = inset_axes(
     ax2,
     width="75%",
     height="75%",
-    bbox_to_anchor=(0.075, 0.55, 0.5, 0.5),
+    # bbox_to_anchor=(0.075, 0.55, 0.5, 0.5),
+    bbox_to_anchor=(0.3, 0.55, 0.5, 0.5),
     bbox_transform=ax2.transAxes,
     loc="lower left",
 )
@@ -348,10 +405,10 @@ ax1.tick_params(axis="y", labelsize=20, labeltop=True, labelbottom=False)
 
 ax1.set_ylabel("Association lifetime\ndistribution, power\nlaw exponent", fontsize=40)
 
-ax2.set_xticks([])
-ax2.set_xlim(-0.75, np.arange(len(names_sorted))[-1] + 0.75)
+ax2.set_xticks([0,1],['Known binders', 'Non binders'])
+# ax2.set_xlim(-0.75, np.arange(len(names_sorted))[-1] + 0.75)
 ax2.set_ylabel("Asssociation events\nper protein per ATP", fontsize=40)
 ax2.tick_params(labelsize=20)
-ax2.set_ylim(0, 4.2)
+# ax2.set_ylim(0, 1)
 
 fig.savefig("figure_4.png", dpi=500, bbox_inches="tight")
