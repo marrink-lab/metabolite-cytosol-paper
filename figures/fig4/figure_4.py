@@ -170,9 +170,13 @@ datasets = [
 
 surface_areas = pickle.load(open(f"{base}/figures/_revision/protein_sasa.pkl", "rb"))
 
+# proteomics = pd.read_csv(
+#     f"{base}/processed_data/proteomics_annotated.csv", index_col="Locus tag"
+# )
 proteomics = pd.read_csv(
-    f"{base}/processed_data/proteomics_annotated.csv", index_col="Locus tag"
-)
+    f"{base}/figures/_revision/proteomics_annotated.csv",
+    index_col="Locus tag"
+    )
 
 # get metabolite classes from the master database spreadsheet on the M3-metabolome repo
 metabolites_url = "https://raw.githubusercontent.com/Martini-Force-Field-Initiative/M3-Metabolome/refs/heads/main/misc/database.csv"
@@ -213,9 +217,10 @@ for idx, d in enumerate(datasets):
 # from the proteomics, make a dictionary indicating whether the each protein is a known binder of ATP or not
 ATP_mask = {}
 for protein in proteomics.T:
-    ligs = proteomics.loc[protein]["Ligands"]
+    ligs = proteomics.loc[protein]["atp_binding"]
     protein_renamed = protein[-3:] + "_monomer"
-    if "ATP" in str(ligs):
+    # if "ATP" in str(ligs):
+    if ligs:
         ATP_mask[protein_renamed] = True
     else:
         ATP_mask[protein_renamed] = False
